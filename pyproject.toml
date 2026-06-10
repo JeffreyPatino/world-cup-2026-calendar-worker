@@ -1,0 +1,23 @@
+[project]
+name = "world-cup-2026-calendar-worker"
+version = "0.1.0"
+description = "Cloudflare Python Worker serving a dynamic FIFA World Cup 2026 iCalendar feed"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi",
+  "icalendar",
+]
+
+[project.optional-dependencies]
+dev = [
+  "httpx",
+  "pytest",
+  "pytest-asyncio",
+  "workers-py",
+  "workers-runtime-sdk",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

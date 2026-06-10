@@ -1,0 +1,19 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "world-cup-2026-calendar-worker",
+  "main": "src/main.py",
+  "compatibility_date": "2026-06-10",
+  "compatibility_flags": ["python_workers"],
+  "workers_dev": true,
+  "observability": {
+    "enabled": true
+  },
+  "triggers": {
+    "crons": ["0 10 * * *"]
+  },
+  "kv_namespaces": [
+    {
+      "binding": "MATCH_DATA"
+    }
+  ]
+}
