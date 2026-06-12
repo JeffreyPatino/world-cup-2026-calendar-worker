@@ -24,11 +24,9 @@ async def fetch_world_cup_matches(token: str, season: int = 2026) -> dict[str, A
     query = urlencode({"season": str(season)})
     response = await fetch(
         f"{FOOTBALL_DATA_BASE_URL}{WORLD_CUP_MATCHES_PATH}?{query}",
-        {
-            "headers": {
-                "X-Auth-Token": token,
-                "Accept": "application/json",
-            }
+        headers={
+            "X-Auth-Token": token,
+            "Accept": "application/json",
         },
     )
     if response.status < 200 or response.status >= 300:
@@ -40,4 +38,3 @@ def get_api_token(env: Any) -> str | None:
     if isinstance(env, dict):
         return env.get("FOOTBALL_DATA_API_TOKEN")
     return getattr(env, "FOOTBALL_DATA_API_TOKEN", None)
-
