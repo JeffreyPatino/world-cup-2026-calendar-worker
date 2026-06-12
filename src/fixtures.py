@@ -4,11 +4,13 @@ import json
 from pathlib import Path
 from typing import Any
 
+from src.fallback_data import FALLBACK_FIXTURE_DATA
 from src.models import FixturePayload, FixtureValidationError
 
 
 KV_FIXTURE_KEY = "worldcup:fixtures:current"
 FALLBACK_DATA_PATH = Path(__file__).resolve().parent.parent / "data" / "matches.json"
+LOCAL_DATA_PATH = Path(__file__).resolve().parent.parent / "data" / "matches.local.json"
 
 
 async def load_fixture_payload(env: Any | None = None) -> FixturePayload:
@@ -20,9 +22,22 @@ async def load_fixture_payload(env: Any | None = None) -> FixturePayload:
 
 
 def load_fallback_payload() -> FixturePayload:
-    with FALLBACK_DATA_PATH.open("r", encoding="utf-8") as file:
-        data = json.load(file)
+    if LOCAL_DATA_PATH.exists():
+        with LOCAL_DATA_PATH.open("r", encoding="utf-8") as file:
+            data = json.load(file)
+    elif FALLBACK_DATA_PATH.exists():
+        with FALLBACK_DATA_PATH.open("r", encoding="utf-8") as file:
+            data = json.load(file)
+    else:
+        data = FALLBACK_FIXTURE_DATA
     return FixturePayload.from_dict(data)
+
+
+def write_local_fixture_payload(payload: FixturePayload) -> None:
+    LOCAL_DATA_PATH.write_text(
+        json.dumps(payload.to_dict(), indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
 
 
 async def write_fixture_payload(env: Any, payload: FixturePayload) -> None:
