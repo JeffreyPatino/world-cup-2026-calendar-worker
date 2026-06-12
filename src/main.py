@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from fastapi import FastAPI, Request
-from fastapi.responses import PlainTextResponse, Response
+from fastapi import FastAPI, Header, HTTPException, Request
+from fastapi.responses import JSONResponse, PlainTextResponse, Response
 
 try:
     from src.calendar_builder import build_calendar
@@ -38,10 +38,7 @@ class Default(WorkerEntrypoint):
         return await asgi.fetch(app, request, self.env)
 
     async def scheduled(self, controller, env, ctx):
-        token = get_api_token(env)
-        raw_data = await fetch_world_cup_matches(token or "")
-        payload = normalize_football_data_response(raw_data)
-        await write_fixture_payload(env, payload)
+        await refresh_fixture_data(env)
 
 
 @app.get("/", response_class=PlainTextResponse)
@@ -61,3 +58,40 @@ async def world_cup_calendar(request: Request) -> Response:
             "Cache-Control": "public, max-age=900",
         },
     )
+
+
+@app.post("/admin/refresh")
+async def refresh_fixtures(
+    request: Request,
+    x_refresh_token: str | None = Header(default=None),
+) -> JSONResponse:
+    env = request.scope.get("env")
+    expected_token = _get_env_value(env, "REFRESH_TOKEN")
+    if not expected_token:
+        raise HTTPException(status_code=503, detail="REFRESH_TOKEN is not configured")
+    if x_refresh_token != expected_token:
+        raise HTTPException(status_code=401, detail="Invalid refresh token")
+
+    payload = await refresh_fixture_data(env)
+    return JSONResponse(
+        {
+            "ok": True,
+            "source": payload.source,
+            "last_updated": payload.last_updated,
+            "match_count": len(payload.matches),
+        }
+    )
+
+
+async def refresh_fixture_data(env):
+    token = get_api_token(env)
+    raw_data = await fetch_world_cup_matches(token or "")
+    payload = normalize_football_data_response(raw_data)
+    await write_fixture_payload(env, payload)
+    return payload
+
+
+def _get_env_value(env, key: str) -> str | None:
+    if isinstance(env, dict):
+        return env.get(key)
+    return getattr(env, key, None)
