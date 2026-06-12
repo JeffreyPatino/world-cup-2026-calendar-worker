@@ -3,10 +3,16 @@ from __future__ import annotations
 from fastapi import FastAPI, Request
 from fastapi.responses import PlainTextResponse, Response
 
-from src.calendar_builder import build_calendar
-from src.fixtures import load_fixture_payload, write_fixture_payload
-from src.football_data_client import fetch_world_cup_matches, get_api_token
-from src.normalizer import normalize_football_data_response
+try:
+    from src.calendar_builder import build_calendar
+    from src.fixtures import load_fixture_payload, write_fixture_payload
+    from src.football_data_client import fetch_world_cup_matches, get_api_token
+    from src.normalizer import normalize_football_data_response
+except ModuleNotFoundError:
+    from calendar_builder import build_calendar
+    from fixtures import load_fixture_payload, write_fixture_payload
+    from football_data_client import fetch_world_cup_matches, get_api_token
+    from normalizer import normalize_football_data_response
 
 
 try:

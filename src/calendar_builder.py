@@ -5,7 +5,10 @@ from hashlib import sha256
 
 from icalendar import Calendar, Event
 
-from src.models import Fixture, FixturePayload, parse_utc_datetime
+try:
+    from src.models import Fixture, FixturePayload, parse_utc_datetime
+except ModuleNotFoundError:
+    from models import Fixture, FixturePayload, parse_utc_datetime
 
 
 CALENDAR_NAME = "FIFA World Cup 2026"
@@ -96,4 +99,3 @@ def _ical_status(status: str) -> str:
     if normalized in {"POSTPONED", "SUSPENDED"}:
         return "TENTATIVE"
     return "CONFIRMED"
-

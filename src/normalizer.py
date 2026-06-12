@@ -2,7 +2,10 @@ from __future__ import annotations
 
 from typing import Any
 
-from src.models import FixturePayload, utc_now_iso
+try:
+    from src.models import FixturePayload, utc_now_iso
+except ModuleNotFoundError:
+    from models import FixturePayload, utc_now_iso
 
 
 SOURCE_URL = "https://www.football-data.org/"
@@ -99,4 +102,3 @@ def _optional_str(value: Any) -> str | None:
     if isinstance(value, str) and value:
         return value
     return None
-

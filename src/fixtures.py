@@ -4,8 +4,12 @@ import json
 from pathlib import Path
 from typing import Any
 
-from src.fallback_data import FALLBACK_FIXTURE_DATA
-from src.models import FixturePayload, FixtureValidationError
+try:
+    from src.fallback_data import FALLBACK_FIXTURE_DATA
+    from src.models import FixturePayload, FixtureValidationError
+except ModuleNotFoundError:
+    from fallback_data import FALLBACK_FIXTURE_DATA
+    from models import FixturePayload, FixtureValidationError
 
 
 KV_FIXTURE_KEY = "worldcup:fixtures:current"
