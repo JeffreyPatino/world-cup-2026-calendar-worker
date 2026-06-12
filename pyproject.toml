@@ -9,11 +9,12 @@ dependencies = [
   "icalendar",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
   "httpx",
   "pytest",
   "pytest-asyncio",
+  "uvicorn",
   "workers-py",
   "workers-runtime-sdk",
 ]
