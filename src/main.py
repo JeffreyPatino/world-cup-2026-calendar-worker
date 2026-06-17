@@ -37,8 +37,9 @@ class Default(WorkerEntrypoint):
             raise RuntimeError("Cloudflare ASGI adapter is not available")
         return await asgi.fetch(app, request, self.env)
 
-    async def scheduled(self, controller, env, ctx):
-        await refresh_fixture_data(env)
+    async def scheduled(self, controller, env=None, ctx=None):
+        worker_env = env if env is not None else self.env
+        await refresh_fixture_data(worker_env)
 
 
 @app.get("/", response_class=PlainTextResponse)

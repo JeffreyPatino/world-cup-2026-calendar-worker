@@ -55,15 +55,13 @@ The most important design choice is the event UID. Each match uses an immutable 
 ## Prerequisites
 
 - Python 3.12 or newer
-- Node.js and npm
 - A Cloudflare account
 - A free football-data.org API token
-- `uv`, required by Cloudflare's Python Worker tooling through `pywrangler`
 
 On macOS:
 
 ```bash
-brew install python@3.12 node uv
+brew install python@3.12
 ```
 
 ## Local Setup
@@ -81,43 +79,15 @@ Run the test suite:
 pytest
 ```
 
-## Cloudflare Setup
+## Cloudflare Setup (GitHub Integration)
 
-Log in to Cloudflare:
+Instead of manually deploying with command-line tools, this repository is designed to be connected directly to Cloudflare via the dashboard.
 
-```bash
-npx wrangler login
-```
-
-Store the football-data.org token as a Worker secret:
-
-```bash
-pywrangler secret put FOOTBALL_DATA_API_TOKEN
-```
-
-Start the local Worker dev server:
-
-```bash
-pywrangler dev
-```
-
-Then test the calendar endpoint:
-
-```bash
-curl http://localhost:8787/world-cup.ics
-```
-
-Trigger the scheduled refresh locally:
-
-```bash
-curl "http://localhost:8787/cdn-cgi/handler/scheduled?format=json"
-```
-
-Deploy:
-
-```bash
-pywrangler deploy
-```
+1. **Push to GitHub**: Make sure this repository is pushed to your GitHub account.
+2. **Connect in Cloudflare**: Go to **Workers & Pages** in the Cloudflare Dashboard and click **Create application**.
+3. Select the **Workers** tab and choose **Connect to GitHub** (or set it up via the Workers CI/CD options).
+4. Follow the prompts to authorize Cloudflare and select this repository. Cloudflare will automatically handle building and deploying your Worker whenever you push to the `main` branch.
+5. **Configure Secrets & KV**: Once connected, go to your new Worker's **Settings > Variables** in the Cloudflare Dashboard to add your `FOOTBALL_DATA_API_TOKEN` secret and create/bind the `MATCH_DATA` KV Namespace.
 
 ## Data Model
 

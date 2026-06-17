@@ -15,8 +15,6 @@ dev = [
   "pytest",
   "pytest-asyncio",
   "uvicorn",
-  "workers-py",
-  "workers-runtime-sdk",
 ]
 
 [tool.pytest.ini_options]
