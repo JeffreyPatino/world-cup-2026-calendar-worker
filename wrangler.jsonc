@@ -15,5 +15,17 @@
     {
       "binding": "MATCH_DATA"
     }
-  ]
+  ],
+  "env": {
+    "preview": {
+      "triggers": {
+        "crons": []
+      },
+      "kv_namespaces": [
+        {
+          "binding": "MATCH_DATA"
+        }
+      ]
+    }
+  }
 }
