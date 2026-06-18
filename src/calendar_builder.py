@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import defaultdict
 from datetime import UTC, timedelta
 from hashlib import sha256
 
@@ -26,10 +27,25 @@ def build_calendar(payload: FixturePayload) -> str:
     calendar.add("x-wr-calname", CALENDAR_NAME)
     calendar.add("x-wr-caldesc", CALENDAR_DESCRIPTION)
 
+    group_teams = _build_group_teams_map(payload)
+
     for fixture in sorted(payload.matches, key=lambda match: (match.kickoff_utc, match.fixture_id)):
-        calendar.add_component(_build_event(fixture))
+        calendar.add_component(_build_event(fixture, group_teams))
 
     return calendar.to_ical().decode("utf-8")
+
+
+def _build_group_teams_map(payload: FixturePayload) -> dict[str, list[str]]:
+    """Return a mapping of group name -> sorted list of unique team names."""
+    teams_by_group: dict[str, set[str]] = defaultdict(set)
+    for fixture in payload.matches:
+        if not fixture.group:
+            continue
+        if fixture.home_team:
+            teams_by_group[fixture.group].add(fixture.home_team)
+        if fixture.away_team:
+            teams_by_group[fixture.group].add(fixture.away_team)
+    return {group: sorted(teams) for group, teams in teams_by_group.items()}
 
 
 def stable_uid(fixture_id: str) -> str:
@@ -37,7 +53,7 @@ def stable_uid(fixture_id: str) -> str:
     return f"{digest}@{UID_DOMAIN}"
 
 
-def _build_event(fixture: Fixture) -> Event:
+def _build_event(fixture: Fixture, group_teams: dict[str, list[str]]) -> Event:
     starts_at = parse_utc_datetime(fixture.kickoff_utc)
     ends_at = starts_at + timedelta(minutes=fixture.duration_minutes)
 
@@ -52,7 +68,7 @@ def _build_event(fixture: Fixture) -> Event:
     if location:
         event.add("location", location)
 
-    description = _description(fixture)
+    description = _description(fixture, group_teams)
     if description:
         event.add("description", description)
 
@@ -66,17 +82,22 @@ def _summary(fixture: Fixture) -> str:
     return f"{home} vs {away}"
 
 
-def _description(fixture: Fixture) -> str:
+def _description(fixture: Fixture, group_teams: dict[str, list[str]]) -> str:
     parts = [f"Stage: {fixture.stage}", f"Status: {fixture.status}"]
     if fixture.group:
-        parts.append(f"Group: {fixture.group}")
+        teams = group_teams.get(fixture.group)
+        group_line = f"Group: {fixture.group}"
+        if teams:
+            group_line += f" ({', '.join(teams)})"
+        parts.append(group_line)
     if fixture.matchday:
         parts.append(f"Matchday: {fixture.matchday}")
+    venue = fixture.venue.display()
+    if venue:
+        parts.append(f"Venue: {venue}")
     score = _score_line(fixture)
     if score:
         parts.append(score)
-    if fixture.source_url:
-        parts.append(f"Source: {fixture.source_url}")
     return "\n".join(parts)
 
 
