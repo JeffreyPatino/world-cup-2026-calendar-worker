@@ -4,8 +4,10 @@ from typing import Any
 
 try:
     from src.models import FixturePayload, utc_now_iso
+    from src.venue_lookup import VENUE_LOOKUP
 except ModuleNotFoundError:
     from models import FixturePayload, utc_now_iso
+    from venue_lookup import VENUE_LOOKUP
 
 
 SOURCE_URL = "https://www.football-data.org/"
@@ -46,11 +48,11 @@ def _normalize_match(match: dict[str, Any]) -> dict[str, Any]:
         "away_team_code": _team_code(match.get("awayTeam")),
         "kickoff_utc": _required_str(match, "utcDate"),
         "duration_minutes": _duration_minutes(match),
-        "venue": {
+        "venue": VENUE_LOOKUP.get(f"football-data:{match_id}", {
             "name": _optional_str(match.get("venue")),
             "city": None,
             "country": None,
-        },
+        }),
         "status": _optional_str(match.get("status")) or "SCHEDULED",
         "score": _normalize_score(match.get("score")),
         "source_url": SOURCE_URL,
