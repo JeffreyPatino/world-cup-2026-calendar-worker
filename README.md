@@ -13,6 +13,30 @@ The project is intentionally small: FastAPI handles the HTTP route, Cloudflare K
 - Refreshes fixture data daily with a Cloudflare Cron Trigger
 - Keeps all match times in UTC so calendar apps localize correctly
 
+## Production Endpoint & Subscribing
+
+Once deployed to Cloudflare, your worker will be available at a URL similar to:
+`https://world-cup-2026-calendar-worker.<your-username>.workers.dev`
+
+The calendar feed is served at the `/world-cup.ics` path. 
+
+**Calendar Feed URL:**
+`https://world-cup-2026-calendar-worker.<your-username>.workers.dev/world-cup.ics`
+
+### How to Subscribe
+
+**Apple Calendar (iOS / macOS)**
+1. Open the Calendar app.
+2. Go to **File > New Calendar Subscription...** (or Settings > Calendar > Accounts > Add Account > Other > Add Subscribed Calendar on iOS).
+3. Paste the **Calendar Feed URL** and click Subscribe.
+4. Set Auto-refresh to **Every Day** so you receive knockout stage updates!
+
+**Google Calendar**
+1. Open Google Calendar on the web.
+2. On the left sidebar, click the **+** next to "Other calendars" and select **From URL**.
+3. Paste the **Calendar Feed URL** and click Add Calendar.
+*(Note: Google Calendar refreshes automatically, but it can sometimes take up to 24 hours to sync updates).*
+
 ## Architecture
 
 ```text
