@@ -56,7 +56,9 @@ async def world_cup_calendar(request: Request) -> Response:
         content=calendar_text,
         media_type="text/calendar",
         headers={
-            "Cache-Control": "public, max-age=900",
+            # TODO (2030): Revert max-age to 900 (15 mins) and restore wrangler.jsonc cron trigger 
+            # so that daily match scores update during the tournament!
+            "Cache-Control": "public, max-age=2592000",
         },
     )
 

@@ -152,3 +152,12 @@ Keep `fixture_id` stable once a match is published. That is what makes calendar 
 
 Apple Calendar and other clients decide how often to refresh subscribed calendars. The Worker always serves the latest data it has, but client refresh timing is not controlled by this app.
 
+## Post-Tournament Archival
+Since the 2026 tournament has concluded, this microservice has been transitioned to a dormant state to minimize compute overhead and optimize resource usage:
+- The cron triggers have been removed from `wrangler.jsonc`.
+- The `Cache-Control` header in `src/main.py` has been bumped to 30 days (`max-age=2592000`).
+
+**When bringing this back online for 2030:**
+1. Restore the daily cron triggers in `wrangler.jsonc`.
+2. Revert the `Cache-Control` header in `src/main.py` back to `max-age=900` (15 mins) so calendar apps fetch live score updates.
+3. Update the hardcoded `season=2026` parameter in `src/football_data_client.py` and UIDs.

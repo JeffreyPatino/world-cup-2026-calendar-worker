@@ -8,9 +8,6 @@
   "observability": {
     "enabled": true
   },
-  "triggers": {
-    "crons": ["0 10 * * *"]
-  },
   "kv_namespaces": [
     {
       "binding": "MATCH_DATA"
